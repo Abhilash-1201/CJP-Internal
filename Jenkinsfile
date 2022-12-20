@@ -54,7 +54,7 @@ pipeline{
        steps { 
                 kubernetesDeploy(
                     configs: 'springboot.yaml',
-                    kubeconfigId: 'DEVK8S',
+                    kubeconfigId: 'DEVK8',
                     enableConfigSubstitution: true
                     )               
              }  
