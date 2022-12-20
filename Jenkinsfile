@@ -1,37 +1,39 @@
 pipeline{
-    agent {label 'login_page'}
+    agent any
     environment { 
                   registry1 = "519852036875.dkr.ecr.us-east-2.amazonaws.com/cloudjournee:${env.BUILD_NUMBER}"
                 }
+    tools {maven "MAVEN"}
     stages{
-        stage('CHECKOUT GIT'){
+        stage('code checkout from GitHub'){
             steps{
-                step([$class: 'WsCleanup'])
-                git branch: 'master', url: 'https://github.com/nayab786910/myspring-boot.git'
+                //check out code from the GitHub
+                git branch: 'main', url: 'https://github.com/Abhilash-1201/myspring-boot-dev.git'
             }
         }
-        stage('CODE QUALITY'){
-          agent {label 'login_page'}
+        //This stage gets all code Quality check from the GitHub Repository
+        stage('Code Quality Check via SonarQube'){
             steps{
                 script{
-                    withSonarQubeEnv('sonarqube_cred'){
+                    def scannerHome = tool 'sonarqube-scanner';
+                    withSonarQubeEnv(credentialsId: 'sonarqube_access_token'){
                         if(fileExists("sonar-project.properties")) {
-                         sh "mvn sonar:sonar"
-                         }
+                         sh "${tool("sonarqube-scanner")}/bin/sonar-scanner"
+                             
+                         }  
+                        
                     }
                 }
             }
         }
         stage('BUILDING ARTIFACT'){
-          agent { label 'login_page'}
      			 steps{
         			  echo 'build '
                 sh "mvn clean package"
      			  }
         }
         stage('DOCKER IMAGE FOR DEV') 
-       {
-          agent { label 'login_page'}
+        {
           steps{
               script {
                 myImage = docker.build registry1
@@ -39,7 +41,6 @@ pipeline{
            }
         }
        stage('PUSHING TO DEV ECR') {
-          agent { label 'login_page'}
           steps{  
           script {
                  sh 'aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 519852036875.dkr.ecr.us-east-2.amazonaws.com'
@@ -72,7 +73,6 @@ pipeline{
 //         }
          // Build the docker image to store in to Prod ECR
         stage('DOCKER IMAGE FOR PROD')  {
-            agent { label 'login_page'}
          steps{
            script{
                dockerImage = docker.build registry1
@@ -81,7 +81,6 @@ pipeline{
        }
          // Push the docker image in to prod ECR
        stage('PUSHING TO PROD-ECR') {
-           agent { label 'login_page'}
         steps{  
          script {
                 //sh 'aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 519852036875.dkr.ecr.us-east-2.amazonaws.com'
