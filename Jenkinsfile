@@ -8,7 +8,7 @@ pipeline{
         stage('code checkout from GitHub'){
             steps{
                 //check out code from the GitHub
-                git branch: 'main', url: 'https://github.com/Abhilash-1201/myspring-boot-dev.git'
+                git branch: 'master', url: 'https://github.com/Abhilash-1201/CJP-Internal.git'
             }
         }
         //This stage gets all code Quality check from the GitHub Repository
