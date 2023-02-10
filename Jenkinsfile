@@ -3,7 +3,7 @@ pipeline{
     environment { 
                   registry1 = "519852036875.dkr.ecr.us-east-2.amazonaws.com/cloudjournee:${env.BUILD_NUMBER}"
                 }
-    tools {maven "MAVEN"}
+    //tools {maven "MAVEN"}
     stages{
         stage('code checkout from GitHub'){
             steps{
@@ -12,26 +12,26 @@ pipeline{
             }
         }
         //This stage gets all code Quality check from the GitHub Repository
-        stage('Code Quality Check via SonarQube'){
-            steps{
-                script{
-                    def scannerHome = tool 'sonarqube-scanner';
-                    withSonarQubeEnv(credentialsId: 'sonarqube_access_token'){
-                        if(fileExists("sonar-project.properties")) {
-                         sh "${tool("sonarqube-scanner")}/bin/sonar-scanner"
-                             
-                         }  
-                        
-                    }
-                }
-            }
-        }
-//        stage('BUILDING ARTIFACT'){
-//     			 steps{
-//       			  echo 'build '
-//               sh "mvn clean package"
-//     			  }
+//        stage('Code Quality Check via SonarQube'){
+//            steps{
+//                script{
+//                    def scannerHome = tool 'sonarqube-scanner';
+//                    withSonarQubeEnv(credentialsId: 'sonarqube_access_token'){
+//                        if(fileExists("sonar-project.properties")) {
+//                         sh "${tool("sonarqube-scanner")}/bin/sonar-scanner"
+//                             
+//                         }  
+//                        
+//                    }
+//                }
+//            }
 //        }
+        stage('BUILDING ARTIFACT'){
+     			 steps{
+       			  echo 'build '
+               sh "mvn clean package"
+     			  }
+        }
 //        stage('DOCKER IMAGE FOR DEV') 
 //        {
 //          steps{
